@@ -1,0 +1,29 @@
+---
+
+prometheus:
+  ingress:
+    enabled: true
+    hosts: &prometheus-hosts
+      - "prometheus.${DOMAIN}"
+    tls:
+      - hosts: *prometheus-hosts
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+
+grafana:
+  persistence:
+    enabled: true
+  deploymentStrategy:
+    type: Recreate
+  ingress:
+    enabled: true
+    hosts: &grafana-hosts
+      - "grafana.${DOMAIN}"
+    tls:
+      - hosts: *grafana-hosts
