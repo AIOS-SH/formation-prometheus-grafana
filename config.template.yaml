@@ -1,4 +1,11 @@
 ---
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+
+#kubeScheduler:
+  #enabled: false
+
+#kubeControllerManager:
+  #enabled: false
 
 prometheus:
   ingress:
@@ -17,6 +24,7 @@ prometheus:
               storage: 1Gi
 
 grafana:
+  plugins: ["jdbranham-diagram-panel"]
   persistence:
     enabled: true
   deploymentStrategy:
@@ -27,3 +35,23 @@ grafana:
       - "grafana.${DOMAIN}"
     tls:
       - hosts: *grafana-hosts
+
+alertmanager:
+  ingress:
+    enabled: true
+    hosts: &alertmanager-hosts
+      - "alertmanager.${DOMAIN}"
+    tls:
+      - hosts: *alertmanager-hosts
+  config:
+    route:
+      routes: []
+      receiver: 'exploit-team-by-email'
+    receivers:
+      - name: 'null'
+      - name: "exploit-team-by-email"
+        email_configs:
+          - to: 'my-team@exploit.fr'
+            from: 'a-team@prometheus.fr'
+            smarthost: 'mailhog.monitoring:1025'
+            require_tls: false
